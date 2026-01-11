@@ -1,14 +1,13 @@
-
 -- ============================================================
--- SYSTEME DE WHITELIST (@USERNAME)
+-- SYSTEME DE WHITELIST (@USERNAME) AVEC ERREUR VISUELLE
 -- ============================================================
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- Liste des comptes autorisés (On utilise le @Username)
+-- Liste des comptes autorisés (Met les @Username ici)
 local whitelist = {
-    "charlyto68", 
+    "charlyto68",
 }
 
 local function checkWhitelist()
@@ -21,7 +20,7 @@ local function checkWhitelist()
     return false
 end
 
--- Vérification de sécurité
+-- Vérification de sécurité avec affichage d'erreur
 if not checkWhitelist() then
     local sg = Instance.new("ScreenGui", player.PlayerGui)
     local txt = Instance.new("TextLabel", sg)
@@ -33,16 +32,14 @@ if not checkWhitelist() then
     txt.Font = Enum.Font.GothamBold
     txt.TextSize = 22
     
-    -- Aide au débogage dans la console (F9)
-    print("Votre Username actuel est : " .. player.Name)
-    
+    warn("[ACCÈS BLOQUÉ] Tentative par : @" .. player.Name)
     task.wait(4)
     sg:Destroy()
-    return 
+    return -- Arrête l'exécution du script TP
 end
 
 -- ============================================================
--- LE RESTE DU SCRIPT (S'exécute si Whitelisté)
+-- STEZ HUB | TP + AUTO BLOCK (LANCÉ SI WHITELISTÉ)
 -- ============================================================
 
 local StarterGui = game:GetService("StarterGui")
@@ -77,7 +74,7 @@ Title.TextSize = 18
 Title.BackgroundTransparency = 1
 Title.TextXAlignment = Enum.TextXAlignment.Center
 
--- Footer
+-- Footer Text (Discord)
 local Footer = Instance.new("TextLabel", Frame)
 Footer.Size = UDim2.new(1, -20, 0, 20)
 Footer.Position = UDim2.new(0, 10, 1, -30)
@@ -86,64 +83,94 @@ Footer.TextColor3 = Color3.fromRGB(0, 255, 0)
 Footer.Font = Enum.Font.GothamBold
 Footer.TextSize = 14
 Footer.BackgroundTransparency = 1
+Footer.TextXAlignment = Enum.TextXAlignment.Center
 
--- Bouton Teleport
+-- Teleport Button
 local TeleportButton = Instance.new("TextButton", Frame)
 TeleportButton.Size = UDim2.new(0, 180, 0, 50)
 TeleportButton.Position = UDim2.new(0, 20, 0, 60)
 TeleportButton.Text = "Teleport"
+TeleportButton.TextColor3 = Color3.fromRGB(0,0,0)
+TeleportButton.Font = Enum.Font.GothamBold
+TeleportButton.TextSize = 16
 TeleportButton.BackgroundColor3 = Color3.fromRGB(255,255,255)
+TeleportButton.BorderSizePixel = 0
 Instance.new("UICorner", TeleportButton).CornerRadius = UDim.new(0, 10)
 
--- Bouton Keybind
+-- Keybind Button
 local KeybindButton = Instance.new("TextButton", Frame)
 KeybindButton.Size = UDim2.new(0, 180, 0, 50)
 KeybindButton.Position = UDim2.new(0, 20, 0, 120)
 KeybindButton.Text = "Keybind: [F]"
+KeybindButton.TextColor3 = Color3.fromRGB(0,0,0)
+KeybindButton.Font = Enum.Font.GothamBold
+KeybindButton.TextSize = 16
 KeybindButton.BackgroundColor3 = Color3.fromRGB(255,255,255)
+KeybindButton.BorderSizePixel = 0
 Instance.new("UICorner", KeybindButton).CornerRadius = UDim.new(0, 10)
 
--- Locations
+-- Saved Locations
 local spots = {
     CFrame.new(-402.18, -6.34, 131.83) * CFrame.Angles(0, math.rad(-20.08), 0),
     CFrame.new(-416.66, -6.34, -2.05) * CFrame.Angles(0, math.rad(-62.89), 0),
     CFrame.new(-329.37, -4.68, 18.12) * CFrame.Angles(0, math.rad(-30.53), 0),
 }
 
+local REQUIRED_TOOL = "Flying Carpet"
 local teleportKey = Enum.KeyCode.F
 local waitingForKey = false
+local lastStealer = nil
+
+-- Fonctions Logic
+local function equipFlyingCarpet()
+    local tool = char:FindFirstChild(REQUIRED_TOOL) or backpack:FindFirstChild(REQUIRED_TOOL)
+    if not tool then
+        warn("Flying Carpet not found!")
+        return false
+    end
+    humanoid:EquipTool(tool)
+    return true
+end
+
+local function block(plr)
+    if not plr or plr == player then return end
+    pcall(function()
+        StarterGui:SetCore("PromptBlockPlayer", plr)
+    end)
+end
 
 local function teleportAll()
-    local tool = char:FindFirstChild("Flying Carpet") or backpack:FindFirstChild("Flying Carpet")
-    if tool then humanoid:EquipTool(tool) end
-    
+    if not equipFlyingCarpet() then return end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player then
+            lastStealer = plr
+            break
+        end
+    end
     for _, spot in ipairs(spots) do
         hrp.CFrame = spot
         task.wait(0.12)
     end
-    
-    -- Auto Block (Optionnel)
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr ~= player then
-            pcall(function() StarterGui:SetCore("PromptBlockPlayer", plr) end)
-            break
-        end
+    if lastStealer then
+        block(lastStealer)
     end
 end
 
+-- Interactions
 TeleportButton.MouseButton1Click:Connect(teleportAll)
+
 KeybindButton.MouseButton1Click:Connect(function()
     KeybindButton.Text = "Press a key..."
     waitingForKey = true
 end)
 
-UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
     if waitingForKey and input.UserInputType == Enum.UserInputType.Keyboard then
         teleportKey = input.KeyCode
         KeybindButton.Text = "Keybind: [" .. teleportKey.Name .. "]"
         waitingForKey = false
-    elseif input.KeyCode == teleportKey then
+    elseif input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == teleportKey then
         teleportAll()
     end
 end)
