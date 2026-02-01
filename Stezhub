@@ -5,7 +5,7 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- Liste des comptes autorisés (Met les @Username ici)
+-- Liste des comptes autorisés
 local whitelist = {
     "charlyto68",
     "HugoSous16kJNR",
@@ -23,7 +23,6 @@ local function checkWhitelist()
     return false
 end
 
--- Vérification de sécurité avec affichage d'erreur
 if not checkWhitelist() then
     local sg = Instance.new("ScreenGui", player.PlayerGui)
     local txt = Instance.new("TextLabel", sg)
@@ -38,27 +37,28 @@ if not checkWhitelist() then
     warn("[ACCÈS BLOQUÉ] Tentative par : @" .. player.Name)
     task.wait(4)
     sg:Destroy()
-    return -- Arrête l'exécution du script TP
+    return 
 end
 
 -- ============================================================
--- STEZ HUB | TP + AUTO BLOCK (LANCÉ SI WHITELISTÉ)
+-- STEZ HUB | TP + AUTO BLOCK + ALLOW (MIS À JOUR)
 -- ============================================================
 
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local backpack = player:WaitForChild("Backpack")
 local char = player.Character or player.CharacterAdded:Wait()
 local humanoid = char:WaitForChild("Humanoid")
 local hrp = char:WaitForChild("HumanoidRootPart")
 
--- GUI Setup
+-- GUI Setup (Agrandie à 240)
 local ScreenGui = Instance.new("ScreenGui", player.PlayerGui)
 ScreenGui.Name = "VonsTeleport"
 ScreenGui.ResetOnSpawn = false
 
 local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0, 220, 0, 220)
+Frame.Size = UDim2.new(0, 220, 0, 240)
 Frame.Position = UDim2.new(0.5, -110, 0.5, -110)
 Frame.BackgroundColor3 = Color3.fromRGB(2,2,2)
 Frame.Active = true
@@ -69,97 +69,117 @@ Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 15)
 -- Titre
 local Title = Instance.new("TextLabel", Frame)
 Title.Size = UDim2.new(1, -20, 0, 35)
-Title.Position = UDim2.new(0, 10, 0, 10)
+Title.Position = UDim2.new(0, 10, 0, 5)
 Title.Text = "Stez Hub | TP + Auto Block"
 Title.TextColor3 = Color3.new(1,1,1)
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
+Title.TextSize = 16
 Title.BackgroundTransparency = 1
-Title.TextXAlignment = Enum.TextXAlignment.Center
 
--- Footer Text (Discord)
-local Footer = Instance.new("TextLabel", Frame)
-Footer.Size = UDim2.new(1, -20, 0, 20)
-Footer.Position = UDim2.new(0, 10, 1, -30)
-Footer.Text = ".gg/rE5FjgJVHr"
-Footer.TextColor3 = Color3.fromRGB(0, 255, 0)
-Footer.Font = Enum.Font.GothamBold
-Footer.TextSize = 14
-Footer.BackgroundTransparency = 1
-Footer.TextXAlignment = Enum.TextXAlignment.Center
-
--- Teleport Button
+-- Bouton Teleport
 local TeleportButton = Instance.new("TextButton", Frame)
-TeleportButton.Size = UDim2.new(0, 180, 0, 50)
-TeleportButton.Position = UDim2.new(0, 20, 0, 60)
+TeleportButton.Size = UDim2.new(0, 180, 0, 40)
+TeleportButton.Position = UDim2.new(0, 20, 0, 45)
 TeleportButton.Text = "Teleport"
 TeleportButton.TextColor3 = Color3.fromRGB(0,0,0)
 TeleportButton.Font = Enum.Font.GothamBold
-TeleportButton.TextSize = 16
+TeleportButton.TextSize = 14
 TeleportButton.BackgroundColor3 = Color3.fromRGB(255,255,255)
-TeleportButton.BorderSizePixel = 0
-Instance.new("UICorner", TeleportButton).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", TeleportButton).CornerRadius = UDim.new(0, 8)
 
--- Keybind Button
+-- Bouton Keybind
 local KeybindButton = Instance.new("TextButton", Frame)
-KeybindButton.Size = UDim2.new(0, 180, 0, 50)
-KeybindButton.Position = UDim2.new(0, 20, 0, 120)
+KeybindButton.Size = UDim2.new(0, 180, 0, 40)
+KeybindButton.Position = UDim2.new(0, 20, 0, 95)
 KeybindButton.Text = "Keybind: [F]"
 KeybindButton.TextColor3 = Color3.fromRGB(0,0,0)
 KeybindButton.Font = Enum.Font.GothamBold
-KeybindButton.TextSize = 16
+KeybindButton.TextSize = 14
 KeybindButton.BackgroundColor3 = Color3.fromRGB(255,255,255)
-KeybindButton.BorderSizePixel = 0
-Instance.new("UICorner", KeybindButton).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", KeybindButton).CornerRadius = UDim.new(0, 8)
 
--- Saved Locations
+-- NOUVEAU : Bouton ALLOW/DISALLOW (Style du 2e script)
+local btnAllow = Instance.new("TextButton", Frame)
+btnAllow.Size = UDim2.new(0, 180, 0, 40)
+btnAllow.Position = UDim2.new(0, 20, 0, 145)
+btnAllow.Text = "ALLOW/DISALLOW"
+btnAllow.TextColor3 = Color3.new(1,1,1)
+btnAllow.Font = Enum.Font.GothamBold
+btnAllow.TextSize = 13
+btnAllow.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+Instance.new("UICorner", btnAllow).CornerRadius = UDim.new(0, 8)
+
+-- Footer
+local Footer = Instance.new("TextLabel", Frame)
+Footer.Size = UDim2.new(1, -20, 0, 20)
+Footer.Position = UDim2.new(0, 10, 1, -25)
+Footer.Text = ".gg/rE5FjgJVHr"
+Footer.TextColor3 = Color3.fromRGB(0, 255, 0)
+Footer.Font = Enum.Font.GothamBold
+Footer.TextSize = 12
+Footer.BackgroundTransparency = 1
+
+-- Logic Variables
 local spots = {
     CFrame.new(-402.18, -6.34, 131.83) * CFrame.Angles(0, math.rad(-20.08), 0),
     CFrame.new(-416.66, -6.34, -2.05) * CFrame.Angles(0, math.rad(-62.89), 0),
     CFrame.new(-329.37, -4.68, 18.12) * CFrame.Angles(0, math.rad(-30.53), 0),
 }
-
 local REQUIRED_TOOL = "Flying Carpet"
 local teleportKey = Enum.KeyCode.F
 local waitingForKey = false
 local lastStealer = nil
+local allowActive = false
+local allowDeb = false
 
--- Fonctions Logic
+-- Fonctions
 local function equipFlyingCarpet()
     local tool = char:FindFirstChild(REQUIRED_TOOL) or backpack:FindFirstChild(REQUIRED_TOOL)
-    if not tool then
-        warn("Flying Carpet not found!")
-        return false
-    end
+    if not tool then return false end
     humanoid:EquipTool(tool)
     return true
 end
 
 local function block(plr)
     if not plr or plr == player then return end
-    pcall(function()
-        StarterGui:SetCore("PromptBlockPlayer", plr)
-    end)
+    pcall(function() StarterGui:SetCore("PromptBlockPlayer", plr) end)
 end
 
 local function teleportAll()
     if not equipFlyingCarpet() then return end
     for _, plr in ipairs(Players:GetPlayers()) do
-        if plr ~= player then
-            lastStealer = plr
-            break
-        end
+        if plr ~= player then lastStealer = plr break end
     end
     for _, spot in ipairs(spots) do
         hrp.CFrame = spot
         task.wait(0.12)
     end
-    if lastStealer then
-        block(lastStealer)
-    end
+    if lastStealer then block(lastStealer) end
 end
 
--- Interactions
+-- LOGIQUE ALLOW/DISALLOW (Copiée du script 2)
+btnAllow.MouseButton1Click:Connect(function()
+    if allowDeb then return end
+    allowDeb = true
+    allowActive = not allowActive
+    
+    pcall(function()
+        ReplicatedStorage.Packages.Net["RE/PlotService/ToggleFriends"]:FireServer()
+    end)
+    
+    local s = tick()
+    while tick() - s < 1 do
+        btnAllow.Text = string.format("%.2fs", 1 - (tick() - s))
+        btnAllow.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        task.wait()
+    end
+    
+    btnAllow.Text = "ALLOW/DISALLOW"
+    btnAllow.BackgroundColor3 = allowActive and Color3.fromRGB(0, 180, 80) or Color3.fromRGB(220, 40, 40)
+    allowDeb = false
+end)
+
+-- Autres Interactions
 TeleportButton.MouseButton1Click:Connect(teleportAll)
 
 KeybindButton.MouseButton1Click:Connect(function()
