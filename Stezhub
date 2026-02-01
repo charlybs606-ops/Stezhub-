@@ -1,5 +1,5 @@
 -- ============================================================
--- STEZ HUB | TP LEFT (F) & TP RIGHT (R) - VERSION FINALE V4
+-- STEZ HUB | TP LEFT (F) & TP RIGHT (R) - VERSION FINALE V5
 -- ============================================================
 
 local Players = game:GetService("Players")
@@ -59,17 +59,18 @@ local spotsRight = {
     CFrame.new(-335.19, -5.10, 103.43)
 }
 
--- 3. INTERFACE (220x240)
+-- 3. INTERFACE (Positionnée à DROITE et Déplaçable)
 local ScreenGui = Instance.new("ScreenGui", player.PlayerGui)
 ScreenGui.Name = "VonsTeleport"
 ScreenGui.ResetOnSpawn = false
 
 local Frame = Instance.new("Frame", ScreenGui)
 Frame.Size = UDim2.new(0, 220, 0, 240)
-Frame.Position = UDim2.new(0.5, -110, 0.5, -110)
+-- Position : 85% de la largeur de l'écran, 50% de la hauteur (centré verticalement)
+Frame.Position = UDim2.new(0.85, -110, 0.5, -110) 
 Frame.BackgroundColor3 = Color3.fromRGB(2, 2, 2)
 Frame.Active = true
-Frame.Draggable = true
+Frame.Draggable = true -- Toujours déplaçable
 Frame.BorderSizePixel = 0
 Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 15)
 
@@ -101,7 +102,7 @@ btnRight.Font = Enum.Font.GothamBold
 btnRight.TextSize = 13
 Instance.new("UICorner", btnRight).CornerRadius = UDim.new(0, 8)
 
--- TOUCHES INDICATEURS (F pour Left, R pour Right)
+-- TOUCHES INDICATEURS
 local keyLeft = Instance.new("TextLabel", Frame)
 keyLeft.Size = UDim2.new(0, 90, 0, 40)
 keyLeft.Position = UDim2.new(0, 15, 0, 95)
