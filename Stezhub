@@ -1,5 +1,5 @@
 -- ============================================================
--- STEZ HUB | TP LEFT (R) & TP RIGHT (F) - VERSION FINALE V2
+-- STEZ HUB | TP LEFT (F) & TP RIGHT (R) - VERSION FINALE V4
 -- ============================================================
 
 local Players = game:GetService("Players")
@@ -89,7 +89,7 @@ btnLeft.Position = UDim2.new(0, 15, 0, 45)
 btnLeft.Text = "TP LEFT"
 btnLeft.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 btnLeft.Font = Enum.Font.GothamBold
-btnLeft.TextSize = 13 -- Même taille que le bas
+btnLeft.TextSize = 13
 Instance.new("UICorner", btnLeft).CornerRadius = UDim.new(0, 8)
 
 local btnRight = Instance.new("TextButton", Frame)
@@ -98,14 +98,14 @@ btnRight.Position = UDim2.new(0, 115, 0, 45)
 btnRight.Text = "TP RIGHT"
 btnRight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 btnRight.Font = Enum.Font.GothamBold
-btnRight.TextSize = 13 -- Même taille que le bas
+btnRight.TextSize = 13
 Instance.new("UICorner", btnRight).CornerRadius = UDim.new(0, 8)
 
--- TOUCHES INDICATEURS
+-- TOUCHES INDICATEURS (F pour Left, R pour Right)
 local keyLeft = Instance.new("TextLabel", Frame)
 keyLeft.Size = UDim2.new(0, 90, 0, 40)
 keyLeft.Position = UDim2.new(0, 15, 0, 95)
-keyLeft.Text = "tp left : r"
+keyLeft.Text = "Keybind: [F]"
 keyLeft.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 keyLeft.Font = Enum.Font.GothamBold
 keyLeft.TextSize = 13
@@ -114,7 +114,7 @@ Instance.new("UICorner", keyLeft).CornerRadius = UDim.new(0, 8)
 local keyRight = Instance.new("TextLabel", Frame)
 keyRight.Size = UDim2.new(0, 90, 0, 40)
 keyRight.Position = UDim2.new(0, 115, 0, 95)
-keyRight.Text = "tp right : f"
+keyRight.Text = "Keybind: [R]"
 keyRight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 keyRight.Font = Enum.Font.GothamBold
 keyRight.TextSize = 13
@@ -188,12 +188,12 @@ btnAllow.MouseButton1Click:Connect(function()
     allowDeb = false
 end)
 
--- Keybinds R et F
+-- Keybinds (F pour Left, R pour Right)
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
-    if input.KeyCode == Enum.KeyCode.R then
+    if input.KeyCode == Enum.KeyCode.F then
         runTP(spotsLeft)
-    elseif input.KeyCode == Enum.KeyCode.F then
+    elseif input.KeyCode == Enum.KeyCode.R then
         runTP(spotsRight)
     end
 end)
